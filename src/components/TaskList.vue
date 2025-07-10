@@ -1,30 +1,27 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
-import type { Task } from '../types';
+import type { Filter, Task } from '../types';
+import { useTaskStore } from '../libs/store/task_store';
 
-const props = defineProps<{tasks: Task[]}>();
+const store = useTaskStore();
+const tasks = computed<Task[]>(() => store.all);
+const filter = ref<Filter>('all');
 
-const emit = defineEmits<{ 
-  updateTask: [id: string],
-  removeTask: [id: string]
-}>();
-
-const filter = ref<'all' | 'todo' | 'completed'>('all');
-const setFilter = (newFilter: 'all' | 'todo' | 'completed') => {
+const setFilter = (newFilter: Filter) => {
   filter.value = newFilter;
 };
 
-const taskDoneCount = computed(() => props.tasks.filter(task => task.completed).length);
+const taskDoneCount = computed(() => tasks.value.filter(task => task.completed).length);
 const filteredTasks = computed(() => {
   switch (filter.value) {
     case 'todo':
-      return props.tasks.filter(task => !task.completed);
+      return store.todo;
     case 'completed':
-      return props.tasks.filter(task => task.completed);
+      return store.completed;
     default:
-      return props.tasks;
+      return tasks.value;
   }
-});
+})
 
 </script>
 <template>
@@ -40,8 +37,8 @@ const filteredTasks = computed(() => {
       <li v-for="task in filteredTasks" :key="task.id">
         <span :class="{ 'line-through': task.completed }">{{ task.title }}</span>
         <span class="task-actions">
-          <input type="checkbox" @input="emit('updateTask', task.id)" :checked="task.completed" />
-          <button @click="emit('removeTask', task.id)">Remove</button>
+          <input type="checkbox" @input="store.updateTask(task.id)" :checked="task.completed" />
+          <button @click="store.removeTask(task.id)">Remove</button>
         </span>
         </li>
     </transition-group>

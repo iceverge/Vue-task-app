@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
+import { useTaskStore } from '../libs/store/task_store';
+import type { Task } from '../types';
 
-const emit = defineEmits<{ addTask: [newTask: string] }>();
+const store = useTaskStore();
+
 const newTask = ref('');
 const error = ref<string | null>(null);
 
@@ -11,7 +14,12 @@ const handleSubmit = () => {
     error.value = 'Task cannot be empty';
     return;
   }
-  emit('addTask', newTask.value);
+  const task: Task = {
+    id: crypto.randomUUID(),
+    title: newTask.value,
+    completed: false,
+  }
+  store.addTask(task);
   newTask.value = ''; 
 };
 </script>
@@ -36,7 +44,7 @@ const handleSubmit = () => {
   margin: 0 auto;
   label {
     font-size: 16px;
-    color: #333;
+    color: #42b983;
     font-weight: bold;
   }
   .error {
