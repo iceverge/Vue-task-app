@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
-import type { Filter, Task } from '../types';
+import type { Filter, Task } from '../libs/types';
 import { useTaskStore } from '../libs/store/task_store';
 
 const store = useTaskStore();
