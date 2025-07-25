@@ -3,30 +3,30 @@ import { computed, ref } from 'vue';
 import type { Filter, Task } from '../libs/types';
 import { useTaskStore } from '../libs/store/task_store';
 
-const store = useTaskStore();
-const tasks = computed<Task[]>(() => store.all);
+const taskTtore = useTaskStore();
+const tasks = computed<Task[]>(() => taskTtore.all);
 const filter = ref<Filter>('all');
 
 const setFilter = (newFilter: Filter) => {
   filter.value = newFilter;
 };
 
-const taskDoneCount = computed(() => tasks.value.filter(task => task.completed).length);
+const taskDoneCount = computed<Task[]>(() => taskTtore.completed);
 const filteredTasks = computed(() => {
   switch (filter.value) {
     case 'todo':
-      return store.todo;
+      return taskTtore.todo;
     case 'completed':
-      return store.completed;
+      return taskTtore.completed;
     default:
-      return tasks.value;
+      return taskTtore.all;
   }
 })
 
 </script>
 <template>
   <div class="task-list">
-    <h2 v-if="tasks.length"> {{ taskDoneCount }} / {{ tasks.length }} tasks completed</h2>
+    <h2 v-if="tasks.length"> {{ taskDoneCount.length }} / {{ tasks.length }} tasks completed</h2>
     <h2 v-else>No tasks available!</h2>
     <div class="task-filter" v-if="tasks.length">
       <button @click="setFilter('all')" :class="{ active: filter === 'all' }">All</button>
@@ -37,8 +37,8 @@ const filteredTasks = computed(() => {
       <li v-for="task in filteredTasks" :key="task.id">
         <span :class="{ 'line-through': task.completed }">{{ task.title }}</span>
         <span class="task-actions">
-          <input type="checkbox" @input="store.updateTask(task.id)" :checked="task.completed" />
-          <button @click="store.removeTask(task.id)">Remove</button>
+          <input type="checkbox" @input="taskTtore.updateTask(task.id)" :checked="task.completed" />
+          <button @click="taskTtore.removeTask(task.id)">Remove</button>
         </span>
         </li>
     </transition-group>
